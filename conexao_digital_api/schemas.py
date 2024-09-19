@@ -67,12 +67,12 @@ class ProjetoSchema(ModelSchema):
 
 
 class UserSchema(ModelSchema):
-    interesses: list[InteresseSchema] = []
-    habilidades: list[HabilidadeSchema] = []
-    formacoes_academicas: list[FormacaoAcademicaSchema] = []
-    experiencias_profissionais: list[ExperienciaProfissionalSchema] = []
-    projetos: list[ProjetoSchema] = []
-    avatar: str = ''
+    avatar: Optional[str] = None
+    interesses: List[InteresseSchema] = None
+    habilidades: List[InteresseSchema] = None
+    formacoes_academicas: List[FormacaoAcademicaSchema] = None
+    experiencias_profissionais: List[ExperienciaProfissionalSchema] = None
+    projetos: List[ProjetoSchema] = None
 
     class Meta:
         model = User
@@ -86,11 +86,6 @@ class UserSchema(ModelSchema):
             'deficiencia',
             'resumo',
             'avatar',
-            'interesses',
-            'habilidades',
-            'formacoes_academicas',
-            'experiencias_profissionais',
-            'projetos',
         )
 
 

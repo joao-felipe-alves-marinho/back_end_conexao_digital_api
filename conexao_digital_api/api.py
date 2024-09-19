@@ -47,17 +47,22 @@ class UserController(ControllerBase):
         user = User.objects.create_user(**payload.dict())
         return user
 
+    @route.get('/admins', response=List[UserSchema])
+    def get_admins(self):
+        """ Lista todos os administradores """
+        return User.objects.filter(is_superuser=True).all()
+
     @route.get('', response=List[UserSchema])
     def get_users(self):
         """ Lista todos os usuários """
         return User.objects.filter(is_superuser=False).all()
 
-    @route.get('/{user_id}', response=UserSchema)
+    @route.get('/{int:user_id}', response=UserSchema)
     def get_user(self, user_id: int):
         """ Retorna um usuário específico """
         return get_object_or_404(User, id=user_id)
 
-    @route.put('/{user_id}', response=UserSchema)
+    @route.put('/{int:user_id}', response=UserSchema)
     def update_user(self, user_id: int, request):
         """ Atualiza um usuário específico """
         user = get_object_or_404(User, id=user_id)
@@ -65,7 +70,7 @@ class UserController(ControllerBase):
         user.save()
         return user
 
-    @route.delete('/{user_id}', response=UserSchema)
+    @route.delete('/{int:user_id}', response=UserSchema)
     def delete_user(self, user_id: int):
         """ Deleta um usuário específico """
         user = get_object_or_404(User, id=user_id)
@@ -75,7 +80,9 @@ class UserController(ControllerBase):
     @route.get('/me', response=UserSchema, permissions=[permissions.IsAuthenticated])
     def get_me(self, request):
         """ Retorna o usuário autenticado """
-        return request.user
+        # retornar user com habilidades
+        user = get_object_or_404(User, id=request.user.id)
+        return user
 
     @route.put('/me', response=UserSchema, permissions=[permissions.IsAuthenticated])
     def update_me(self, request):
