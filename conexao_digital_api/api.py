@@ -1,48 +1,25 @@
 from typing import List
 from django.shortcuts import get_object_or_404
-from django.contrib.auth import authenticate, login, logout
-from django.middleware.csrf import get_token
-from ninja.security import django_auth
 from ninja_extra import NinjaExtraAPI, api_controller, ControllerBase, route, permissions
+from ninja_auth.api import router as auth_router
 
 from .models import User
-from .schemas import UserSchema, CreateUserSchema, SignInSchema
+from .schemas import UserSchema, CreateOrUpdateUserSchema
 
 api = NinjaExtraAPI(
     version='1.0.0',
     title='Conexao Digital API',
     description='API para o projeto Conexao Digital',
     csrf=True,
-    auth=django_auth,
 )
 
-
-@api.get("/set-csrf-token", auth=None)
-def get_csrf_token(request):
-    return {"csrftoken": get_token(request)}
-
-
-@api.post('/login', auth=None)
-def login(request, payload: SignInSchema):
-    """ Autentica um usuário """
-    user = authenticate(request, username=payload.email, password=payload.password)
-    if user is not None:
-        login(request, user)
-        return {"success": True}
-    return {"success": False, "message": "Invalid credentials"}
-
-
-@api.post('/logout')
-def logout(request):
-    """ Desautentica um usuário """
-    logout(request)
-    return None
+api.add_router('/auth', auth_router)
 
 
 @api_controller('/users', tags=['users'], permissions=[permissions.IsAdminUser])
 class UserController(ControllerBase):
     @route.post('', response=UserSchema, auth=None, permissions=[permissions.AllowAny])
-    def create_user(self, payload: CreateUserSchema):
+    def create_user(self, payload: CreateOrUpdateUserSchema):
         """ Cria um novo usuário """
         user = User.objects.create_user(**payload.dict())
         return user
@@ -63,10 +40,11 @@ class UserController(ControllerBase):
         return get_object_or_404(User, id=user_id)
 
     @route.put('/{int:user_id}', response=UserSchema)
-    def update_user(self, user_id: int, request):
+    def update_user(self, user_id: int, payload: CreateOrUpdateUserSchema):
         """ Atualiza um usuário específico """
         user = get_object_or_404(User, id=user_id)
-        user.__dict__.update(**request.dict())
+        for key, value in payload.dict(exclude_unset=True).items():
+            setattr(user, key, value)
         user.save()
         return user
 
@@ -85,10 +63,11 @@ class UserController(ControllerBase):
         return user
 
     @route.put('/me', response=UserSchema, permissions=[permissions.IsAuthenticated])
-    def update_me(self, request):
+    def update_me(self, payload: CreateOrUpdateUserSchema, request):
         """ Atualiza o usuário autenticado """
         user = request.user
-        user.__dict__.update(**request.dict())
+        for key, value in payload.dict(exclude_unset=True).items():
+            setattr(user, key, value)
         user.save()
         return user
 

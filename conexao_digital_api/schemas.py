@@ -89,7 +89,7 @@ class UserSchema(ModelSchema):
         )
 
 
-class CreateUserSchema(ModelSchema):
+class CreateOrUpdateUserSchema(ModelSchema):
     class Meta:
         model = User
         fields = (
@@ -102,7 +102,6 @@ class CreateUserSchema(ModelSchema):
             'deficiencia',
             'resumo',
         )
-
 
 class ErrorSchema(Schema):
     detail: str
