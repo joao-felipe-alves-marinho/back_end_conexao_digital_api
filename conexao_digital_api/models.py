@@ -41,9 +41,17 @@ class User(AbstractBaseUser, PermissionsMixin):
     ano_nascimento = models.IntegerField()
     genero = models.CharField(max_length=1, choices=gender_choices, default=None)
     telefone = models.CharField(max_length=15)
-    interesses = models.ManyToManyField('Interesse', related_name='usuarios', blank=True)
     deficiencia = models.BooleanField(default=False, blank=True)
     resumo = models.TextField(blank=True)
+    avatar = models.ImageField(upload_to='avatars/', blank=True)
+
+    interesses = models.ManyToManyField('Interesse', related_name='usuarios', blank=True)
+    habilidades = models.ForeignKey('Habilidade', related_name='usuario', blank=True, on_delete=models.CASCADE)
+    formacoes_academicas = models.ForeignKey('FormacaoAcademica', related_name='usuario', blank=True,
+                                             on_delete=models.CASCADE)
+    experiencias_profissionais = models.ForeignKey('ExperienciaProfissional', related_name='usuario', blank=True,
+                                                   on_delete=models.CASCADE)
+    projetos = models.ForeignKey('Projeto', related_name='usuario', blank=True, on_delete=models.CASCADE)
 
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
@@ -74,7 +82,6 @@ class Interesse(models.Model):
 
 
 class FormacaoAcademica(models.Model):
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     curso = models.CharField(max_length=100)
     instituicao = models.CharField(max_length=100)
     ano_inicio = models.IntegerField()
@@ -91,7 +98,6 @@ class FormacaoAcademica(models.Model):
 
 
 class ExperienciaProfissional(models.Model):
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     cargo = models.CharField(max_length=100)
     empresa = models.CharField(max_length=100)
     ano_inicio = models.IntegerField()
@@ -113,7 +119,6 @@ class Habilidade(models.Model):
         (2, 'Intermediário'),
         (3, 'Avançado'),
     ]
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     nome = models.CharField(max_length=100)
     nivel = models.IntegerField(choices=niveis)
 
@@ -127,7 +132,6 @@ class Habilidade(models.Model):
 
 
 class Projeto(models.Model):
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     nome = models.CharField(max_length=100)
     descricao = models.TextField(blank=True)
     link = models.URLField()

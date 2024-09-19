@@ -55,9 +55,6 @@ class ProjetoSchema(ModelSchema):
         fields = (
             'id',
             'nome',
-            'descricao',
-            'ano_inicio',
-            'ano_fim',
             'link',
         )
 

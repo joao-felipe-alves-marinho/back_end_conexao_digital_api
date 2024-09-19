@@ -28,12 +28,12 @@ class UserController(ControllerBase):
         """ Lista todos os usuários """
         return User.objects.filter(is_superuser=False).all()
 
-    @route.get('/users/{id}', response=UserSchema)
+    @route.get('/users/{user_id}', response=UserSchema)
     def get_user(self, user_id: int):
         """ Retorna um usuário específico """
         return get_object_or_404(User, id=user_id)
 
-    @route.put('/users/{id}', response=UserSchema)
+    @route.put('/users/{user_id}', response=UserSchema)
     def update_user(self, user_id: int, request):
         """ Atualiza um usuário específico """
         user = get_object_or_404(User, id=user_id)
@@ -41,7 +41,7 @@ class UserController(ControllerBase):
         user.save()
         return user
 
-    @route.delete('/users/{id}', response=UserSchema)
+    @route.delete('/users/{user_id}', response=UserSchema)
     def delete_user(self, user_id: int):
         """ Deleta um usuário específico """
         user = get_object_or_404(User, id=user_id)
