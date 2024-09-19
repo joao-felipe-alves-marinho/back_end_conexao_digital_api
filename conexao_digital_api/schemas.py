@@ -1,7 +1,14 @@
 from ninja import ModelSchema, Schema
-from typing import List
+from typing import List, Optional
 
 from .models import User, Interesse, FormacaoAcademica, ExperienciaProfissional, Habilidade, Projeto
+
+from pydantic import BaseModel
+
+
+class SignInSchema(BaseModel):
+    email: str
+    password: str
 
 
 class InteresseSchema(ModelSchema):
@@ -60,11 +67,12 @@ class ProjetoSchema(ModelSchema):
 
 
 class UserSchema(ModelSchema):
-    interesses: List[InteresseSchema]
-    habilidades: List[HabilidadeSchema]
-    formacoes_academicas: List[FormacaoAcademicaSchema]
-    experiencias_profissionais: List[ExperienciaProfissionalSchema]
-    projetos: List[ProjetoSchema]
+    interesses: list[InteresseSchema] = []
+    habilidades: list[HabilidadeSchema] = []
+    formacoes_academicas: list[FormacaoAcademicaSchema] = []
+    experiencias_profissionais: list[ExperienciaProfissionalSchema] = []
+    projetos: list[ProjetoSchema] = []
+    avatar: str = ''
 
     class Meta:
         model = User
@@ -77,11 +85,27 @@ class UserSchema(ModelSchema):
             'telefone',
             'deficiencia',
             'resumo',
+            'avatar',
             'interesses',
             'habilidades',
             'formacoes_academicas',
             'experiencias_profissionais',
             'projetos',
+        )
+
+
+class CreateUserSchema(ModelSchema):
+    class Meta:
+        model = User
+        fields = (
+            'nome',
+            'email',
+            'password',
+            'ano_nascimento',
+            'genero',
+            'telefone',
+            'deficiencia',
+            'resumo',
         )
 
 

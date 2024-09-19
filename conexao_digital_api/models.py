@@ -41,17 +41,18 @@ class User(AbstractBaseUser, PermissionsMixin):
     ano_nascimento = models.IntegerField()
     genero = models.CharField(max_length=1, choices=gender_choices, default=None)
     telefone = models.CharField(max_length=15)
-    deficiencia = models.BooleanField(default=False, blank=True)
-    resumo = models.TextField(blank=True)
-    avatar = models.ImageField(upload_to='avatars/', blank=True)
+    deficiencia = models.BooleanField(default=False)
+    resumo = models.TextField(blank=True, null=True)
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
 
     interesses = models.ManyToManyField('Interesse', related_name='usuarios', blank=True)
-    habilidades = models.ForeignKey('Habilidade', related_name='usuario', blank=True, on_delete=models.CASCADE)
+    habilidades = models.ForeignKey('Habilidade', related_name='usuario', blank=True, on_delete=models.CASCADE,
+                                    null=True)
     formacoes_academicas = models.ForeignKey('FormacaoAcademica', related_name='usuario', blank=True,
-                                             on_delete=models.CASCADE)
+                                             on_delete=models.CASCADE, null=True)
     experiencias_profissionais = models.ForeignKey('ExperienciaProfissional', related_name='usuario', blank=True,
-                                                   on_delete=models.CASCADE)
-    projetos = models.ForeignKey('Projeto', related_name='usuario', blank=True, on_delete=models.CASCADE)
+                                                   on_delete=models.CASCADE, null=True)
+    projetos = models.ForeignKey('Projeto', related_name='usuario', blank=True, on_delete=models.CASCADE, null=True)
 
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
