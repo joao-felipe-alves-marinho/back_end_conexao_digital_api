@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'conexao_digital_api',
     'ninja',
+    'ninja_auth',
     'ninja_extra',
+    'ninja_schema',
 ]
 
 MIDDLEWARE = [
