@@ -38,26 +38,19 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     email = models.EmailField(unique=True)
     nome = models.CharField(max_length=200, unique=True)
-    ano_nascimento = models.IntegerField()
+    idade = models.IntegerField()
     genero = models.CharField(max_length=1, choices=gender_choices, default=None)
     telefone = models.CharField(max_length=15)
-    deficiencia = models.BooleanField(default=False, blank=True)
-    resumo = models.TextField(blank=True)
-    avatar = models.ImageField(upload_to='avatars/', blank=True)
-
-    interesses = models.ManyToManyField('Interesse', related_name='usuarios', blank=True)
-    habilidades = models.ForeignKey('Habilidade', related_name='usuario', blank=True, on_delete=models.CASCADE)
-    formacoes_academicas = models.ForeignKey('FormacaoAcademica', related_name='usuario', blank=True,
-                                             on_delete=models.CASCADE)
-    experiencias_profissionais = models.ForeignKey('ExperienciaProfissional', related_name='usuario', blank=True,
-                                                   on_delete=models.CASCADE)
-    projetos = models.ForeignKey('Projeto', related_name='usuario', blank=True, on_delete=models.CASCADE)
+    deficiencia = models.BooleanField(default=False)
+    resumo = models.TextField(blank=True, null=True)
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
 
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['nome', 'ano_nascimento', 'genero', 'telefone']
+    EMAIL_FIELD = 'email'
+    REQUIRED_FIELDS = ['nome', 'idade', 'genero', 'telefone']
     objects = UserManager()
 
     def __str__(self):
@@ -72,6 +65,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Interesse(models.Model):
     nome = models.CharField(max_length=100, unique=True)
 
+    users = models.ManyToManyField(User, related_name='interesses', blank=True)
+
     def __str__(self):
         return self.nome
 
@@ -81,12 +76,36 @@ class Interesse(models.Model):
         verbose_name_plural = "interesses"
 
 
+class Habilidade(models.Model):
+    niveis = [
+        (1, 'Iniciante'),
+        (2, 'Intermediário'),
+        (3, 'Avançado'),
+    ]
+    nome = models.CharField(max_length=100)
+    nivel = models.IntegerField(choices=niveis)
+
+    user = models.ForeignKey(User, related_name='habilidades', blank=True, on_delete=models.CASCADE,
+                             null=True)
+
+    def __str__(self):
+        return self.nome
+
+    class Meta:
+        ordering = ("nome",)
+        verbose_name = "habilidade"
+        verbose_name_plural = "habilidades"
+
+
 class FormacaoAcademica(models.Model):
     curso = models.CharField(max_length=100)
     instituicao = models.CharField(max_length=100)
     ano_inicio = models.IntegerField()
     ano_conclusao = models.IntegerField()
     semestre = models.IntegerField()
+
+    user = models.ForeignKey(User, related_name='formacoes_academicas', blank=True,
+                             on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.curso
@@ -104,6 +123,9 @@ class ExperienciaProfissional(models.Model):
     ano_fim = models.IntegerField(blank=True)
     descricao = models.TextField(blank=True)
 
+    user = models.ForeignKey(User, related_name='experiencias_profissionais', blank=True,
+                             on_delete=models.CASCADE, null=True)
+
     def __str__(self):
         return self.cargo
 
@@ -113,28 +135,12 @@ class ExperienciaProfissional(models.Model):
         verbose_name_plural = "experiências profissionais"
 
 
-class Habilidade(models.Model):
-    niveis = [
-        (1, 'Iniciante'),
-        (2, 'Intermediário'),
-        (3, 'Avançado'),
-    ]
-    nome = models.CharField(max_length=100)
-    nivel = models.IntegerField(choices=niveis)
-
-    def __str__(self):
-        return self.nome
-
-    class Meta:
-        ordering = ("nome",)
-        verbose_name = "habilidade"
-        verbose_name_plural = "habilidades"
-
-
 class Projeto(models.Model):
     nome = models.CharField(max_length=100)
     descricao = models.TextField(blank=True)
     link = models.URLField()
+
+    user = models.ForeignKey(User, related_name='projetos', blank=True, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.nome
