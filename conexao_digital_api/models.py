@@ -38,7 +38,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     email = models.EmailField(unique=True)
     nome = models.CharField(max_length=200, unique=True)
-    ano_nascimento = models.IntegerField()
+    idade = models.IntegerField()
     genero = models.CharField(max_length=1, choices=gender_choices, default=None)
     telefone = models.CharField(max_length=15)
     deficiencia = models.BooleanField(default=False)
@@ -50,7 +50,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
-    REQUIRED_FIELDS = ['nome', 'ano_nascimento', 'genero', 'telefone']
+    REQUIRED_FIELDS = ['nome', 'idade', 'genero', 'telefone']
     objects = UserManager()
 
     def __str__(self):

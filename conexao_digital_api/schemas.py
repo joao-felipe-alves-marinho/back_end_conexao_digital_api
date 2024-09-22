@@ -1,4 +1,4 @@
-from ninja import ModelSchema
+from ninja import ModelSchema, Schema, FilterSchema, Field
 from typing import List, Optional
 from .models import User, Interesse, FormacaoAcademica, ExperienciaProfissional, Habilidade, Projeto
 
@@ -77,7 +77,7 @@ class UserSchema(ModelSchema):
             'id',
             'nome',
             'email',
-            'ano_nascimento',
+            'idade',
             'genero',
             'telefone',
             'deficiencia',
@@ -86,14 +86,13 @@ class UserSchema(ModelSchema):
         )
 
 
-class CreateOrUpdateUserSchema(ModelSchema):
+class UpdateUserSchema(ModelSchema):
     class Meta:
         model = User
         fields = (
             'nome',
             'email',
-            'password',
-            'ano_nascimento',
+            'idade',
             'genero',
             'telefone',
             'deficiencia',
@@ -226,3 +225,36 @@ class CreateOrUpdateProjetoSchema(ModelSchema):
             'descricao',
             'link',
         )
+
+
+class FilterEmailSchema(FilterSchema):
+    genero: Optional[str] = Field(None, q='genero')
+    is_active: Optional[bool] = Field(None, q='is_active')
+    deficiencia: Optional[bool] = Field(None, q='deficiencia')
+
+    # Filters for idade
+    idade_maior_que: Optional[int] = Field(None, q='idade__gte')  # Users with age greater than or equal
+    idade_menor_que: Optional[int] = Field(None, q='idade__lte')  # Users with age less than or equal
+
+    # Filters for academic formation
+    curso: Optional[str] = Field(None, q='formacoes_academicas__curso__icontains')
+    instituicao: Optional[str] = Field(None, q='formacoes_academicas__instituicao__icontains')
+
+    # Filter for semestre above or below a given value
+    semestre_maior_que: Optional[int] = Field(None, q='formacoes_academicas__semestre__gte')  # Semestre greater than or equal
+    semestre_menow_que: Optional[int] = Field(None, q='formacoes_academicas__semestre__lte')  # Semestre less than or equal
+
+    # Filter by interests and skills (habilidades)
+    interesses: Optional[List[str]] = Field(None, q='interesses__nome__in')
+    habilidades: Optional[List[str]] = Field(None, q='habilidades__nome__in')
+    nivel_habilidade: Optional[int] = Field(None, q='habilidades__nivel')  # Filtering by skill level
+
+    # Filter by project involvement
+    projeto_nome: Optional[str] = Field(None, q='projetos__nome__icontains')
+    projeto_link: Optional[str] = Field(None, q='projetos__link__icontains')
+
+
+class EmailRequestSchema(Schema):
+    subject: str
+    message: str
+    emails: Optional[List[str]] = []
