@@ -86,13 +86,12 @@ class UserSchema(ModelSchema):
         )
 
 
-class CreateOrUpdateUserSchema(ModelSchema):
+class UpdateUserSchema(ModelSchema):
     class Meta:
         model = User
         fields = (
             'nome',
             'email',
-            'password',
             'ano_nascimento',
             'genero',
             'telefone',

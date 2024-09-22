@@ -6,6 +6,7 @@ from ninja.router import Router
 from ninja_extra import (
     NinjaExtraAPI,
     api_controller,
+    ControllerBase, route,
     ModelConfig, ModelControllerBase, ModelSchemaConfig, ModelEndpointFactory,
     permissions
 )
@@ -13,7 +14,7 @@ from dj_ninja_auth.controller import NinjaAuthDefaultController
 
 from .models import User, Interesse, Habilidade, FormacaoAcademica, ExperienciaProfissional, Projeto
 from .schemas import (
-    UserSchema,
+    UserSchema, UpdateUserSchema,
     HabilitadeSchema, CreateOrUpdateHabilidadeSchema,
     InteresseSchema, CreateOrUpdateInteresseSchema,
     FormacaoAcademicaSchema, CreateOrUpdateFormacaoAcademicaSchema,
@@ -314,3 +315,157 @@ class AdminUserModelController(ModelControllerBase):
 
 
 api.register_controllers(AdminUserModelController)
+
+
+@api_controller('/me', tags=['users'], permissions=[permissions.IsAuthenticated])
+class MeController(ControllerBase):
+
+    @route.get('', response=UserSchema)
+    def get_me(self, request):
+        return request.user
+
+    @route.put('', response=UserSchema)
+    def update_me(self, request, payload: UpdateUserSchema):
+        user = request.user
+        for attr, value in payload.dict(exclude_unset=True).items():
+            setattr(user, attr, value)
+        user.save()
+        return user
+
+    @route.delete('')
+    def delete_me(self, request):
+        request.user.delete()
+        return None
+
+    @route.post('/interesses', response=InteresseSchema)
+    def create_interesse(self, request, payload: CreateOrUpdateInteresseSchema):
+        interesse = Interesse.objects.filter(nome=payload.nome).first()
+        if not interesse:
+            interesse = Interesse.objects.create(**payload.dict())
+        interesse.users.add(request.user)
+        interesse.save()
+        return interesse
+
+    @route.get('/interesses', response=InteresseSchema)
+    def get_interesses(self, request):
+        return Interesse.objects.filter(users__id=request.user.id)
+
+    @route.delete('/interesses/{int:interesse_id}')
+    def delete_user_from_interesse(self, request, interesse_id: int):
+        interesse = Interesse.objects.get(pk=interesse_id)
+        interesse.users.remove(request.user)
+        interesse.save()
+        return None
+
+    @route.post('/habilidades', response=HabilitadeSchema)
+    def create_habilidade(self, request, payload: CreateOrUpdateHabilidadeSchema):
+        habilidade = Habilidade.objects.create(**payload.dict())
+        habilidade.user = request.user
+        habilidade.save()
+        return habilidade
+
+    @route.get('/habilidades', response=HabilitadeSchema)
+    def get_habilidades(self, request):
+        return Habilidade.objects.filter(user=request.user)
+
+    @route.put('/habilidades/{int:habilidade_id}', response=HabilitadeSchema)
+    def update_habilidade(self, request, habilidade_id: int, payload: CreateOrUpdateHabilidadeSchema):
+        habilidade = Habilidade.objects.get(pk=habilidade_id)
+        if habilidade.user == request.user:
+            for attr, value in payload.dict(exclude_unset=True).items():
+                setattr(habilidade, attr, value)
+            habilidade.save()
+        return habilidade
+
+    @route.delete('/habilidades/{int:habilidade_id}')
+    def delete_habilidade(self, request, habilidade_id: int):
+        habilidade = Habilidade.objects.get(pk=habilidade_id)
+        if habilidade.user == request.user:
+            habilidade.delete()
+        return None
+
+    @route.post('/formacoes-academicas', response=FormacaoAcademicaSchema)
+    def create_formacao_academica(self, request, payload: CreateOrUpdateFormacaoAcademicaSchema):
+        formacao_academica = FormacaoAcademica.objects.create(**payload.dict())
+        formacao_academica.user = request.user
+        formacao_academica.save()
+        return formacao_academica
+
+    @route.get('/formacoes-academicas', response=FormacaoAcademicaSchema)
+    def get_formacoes_academicas(self, request):
+        return FormacaoAcademica.objects.filter(user=request.user)
+
+    @route.put('/formacoes-academicas/{int:formacao_academica_id}', response=FormacaoAcademicaSchema)
+    def update_formacao_academica(self, request, formacao_academica_id: int,
+                                  payload: CreateOrUpdateFormacaoAcademicaSchema):
+        formacao_academica = FormacaoAcademica.objects.get(pk=formacao_academica_id)
+        if formacao_academica.user == request.user:
+            for attr, value in payload.dict(exclude_unset=True).items():
+                setattr(formacao_academica, attr, value)
+            formacao_academica.save()
+        return formacao_academica
+
+    @route.delete('/formacoes-academicas/{int:formacao_academica_id}')
+    def delete_formacao_academica(self, request, formacao_academica_id: int):
+        formacao_academica = FormacaoAcademica.objects.get(pk=formacao_academica_id)
+        if formacao_academica.user == request.user:
+            formacao_academica.delete()
+        return None
+
+    @route.post('/experiencias-profissionais', response=ExperienciaProfissionalSchema)
+    def create_experiencia_profissional(self, request, payload: CreateOrUpdateExperienciaProfissionalSchema):
+        experiencia_profissional = ExperienciaProfissional.objects.create(**payload.dict())
+        experiencia_profissional.user = request.user
+        experiencia_profissional.save()
+        return experiencia_profissional
+
+    @route.get('/experiencias-profissionais', response=ExperienciaProfissionalSchema)
+    def get_experiencias_profissionais(self, request):
+        return ExperienciaProfissional.objects.filter(user=request.user)
+
+    @route.put('/experiencias-profissionais/{int:experiencia_profissional_id}', response=ExperienciaProfissionalSchema)
+    def update_experiencia_profissional(self, request, experiencia_profissional_id: int,
+                                        payload: CreateOrUpdateExperienciaProfissionalSchema):
+        experiencia_profissional = ExperienciaProfissional.objects.get(pk=experiencia_profissional_id)
+        if experiencia_profissional.user == request.user:
+            for attr, value in payload.dict(exclude_unset=True).items():
+                setattr(experiencia_profissional, attr, value)
+            experiencia_profissional.save()
+        return experiencia_profissional
+
+    @route.delete('/experiencias-profissionais/{int:experiencia_profissional_id}')
+    def delete_experiencia_profissional(self, request, experiencia_profissional_id: int):
+        experiencia_profissional = ExperienciaProfissional.objects.get(pk=experiencia_profissional_id)
+        if experiencia_profissional.user == request.user:
+            experiencia_profissional.delete()
+        return None
+
+    @route.post('/projetos', response=ProjetoSchema)
+    def create_projeto(self, request, payload: CreateOrUpdateProjetoSchema):
+        projeto = Projeto.objects.create(**payload.dict())
+        projeto.user = request.user
+        projeto.save()
+        return projeto
+
+    @route.get('/projetos', response=ProjetoSchema)
+    def get_projetos(self, request):
+        return Projeto.objects.filter(user=request.user)
+
+    @route.put('/projetos/{int:projeto_id}', response=ProjetoSchema)
+    def update_projeto(self, request, projeto_id: int, payload: CreateOrUpdateProjetoSchema):
+        projeto = Projeto.objects.get(pk=projeto_id)
+        if projeto.user == request.user:
+            for attr, value in payload.dict(exclude_unset=True).items():
+                setattr(projeto, attr, value)
+            projeto.save()
+        return projeto
+
+    @route.delete('/projetos/{int:projeto_id}')
+    def delete_projeto(self, request, projeto_id: int):
+        projeto = Projeto.objects.get(pk=projeto_id)
+        if projeto.user == request.user:
+            projeto.delete()
+        return None
+
+
+api.register_controllers(MeController)
