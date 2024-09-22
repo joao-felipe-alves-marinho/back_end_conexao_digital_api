@@ -1,9 +1,6 @@
-from ninja import ModelSchema, Schema
+from ninja import ModelSchema
 from typing import List, Optional
-
 from .models import User, Interesse, FormacaoAcademica, ExperienciaProfissional, Habilidade, Projeto
-
-from pydantic import BaseModel
 
 
 class UserInteresseSchema(ModelSchema):
@@ -18,6 +15,11 @@ class UserInteresseSchema(ModelSchema):
 class UserHabilidadeSchema(ModelSchema):
     class Meta:
         model = Habilidade
+        include = (
+            'id',
+            'nome',
+            'nivel',
+        )
         fields = (
             'id',
             'nome',
@@ -64,7 +66,7 @@ class UserProjetoSchema(ModelSchema):
 class UserSchema(ModelSchema):
     avatar: Optional[str] = None
     interesses: List[UserInteresseSchema] = None
-    habilidades: List[UserInteresseSchema] = None
+    habilidades: List[UserHabilidadeSchema] = None
     formacoes_academicas: List[UserFormacaoAcademicaSchema] = None
     experiencias_profissionais: List[UserExperienciaProfissionalSchema] = None
     projetos: List[UserProjetoSchema] = None
@@ -224,7 +226,3 @@ class CreateOrUpdateProjetoSchema(ModelSchema):
             'descricao',
             'link',
         )
-
-
-class ErrorSchema(Schema):
-    detail: str
