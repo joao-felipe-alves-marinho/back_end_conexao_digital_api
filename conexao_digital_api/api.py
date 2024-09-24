@@ -1,9 +1,6 @@
 from django.core.mail import send_mail
-from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
+
 from ninja import Query
-from ninja.security import django_auth
-from ninja.router import Router
 
 from ninja_extra import (
     NinjaExtraAPI,
@@ -12,7 +9,9 @@ from ninja_extra import (
     ModelConfig, ModelControllerBase, ModelSchemaConfig, ModelEndpointFactory,
     permissions
 )
-from dj_ninja_auth.controller import NinjaAuthDefaultController
+
+from dj_ninja_auth.jwt.authentication import JWTAuth
+from dj_ninja_auth.jwt.controller import NinjaAuthJWTController
 
 from .models import User, Interesse, Habilidade, FormacaoAcademica, ExperienciaProfissional, Projeto
 from .schemas import (
@@ -29,22 +28,11 @@ api = NinjaExtraAPI(
     version='1.0.0',
     title='Conexao Digital API',
     description='API para o projeto Conexao Digital',
-    csrf=True,
-    auth=[django_auth],
+    auth=[JWTAuth()],
 )
-router = Router()
-
-api.register_controllers(NinjaAuthDefaultController)
 
 
-@router.get("/csrf", auth=None)
-@ensure_csrf_cookie
-@csrf_exempt
-def csrf(request):
-    return HttpResponse()
-
-
-api.add_router('/auth', router, tags=['auth'])
+api.register_controllers(NinjaAuthJWTController)
 
 
 @api_controller('/admin/users', tags=['admins'], permissions=[permissions.IsAdminUser])

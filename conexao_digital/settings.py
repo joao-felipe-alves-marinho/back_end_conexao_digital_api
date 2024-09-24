@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'ninja_extra',
     'ninja_schema',
     'dj_ninja_auth',
+    'dj_ninja_auth.jwt',
     'corsheaders',
 ]
 
@@ -66,7 +67,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',')
+# CORS setup
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',  # Allow your frontend to make requests to the backend
+]
+
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'conexao_digital.urls'
 
