@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
+from datetime import timedelta
 from pathlib import Path
 
 import dj_database_url
@@ -40,6 +41,9 @@ if RENDER_EXTERNAL_HOSTNAME:
 # Application definition
 
 INSTALLED_APPS = [
+    'semantic_admin',
+    'semantic_forms',
+    'django_filters',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -79,8 +83,7 @@ ROOT_URLCONF = 'conexao_digital.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -141,7 +144,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 # This setting informs Django of the URI path from which your static files will be served to users
-# Here, they well be accessible at your-domain.onrender.com/static/... or yourcustomdomain.com/static/...
+# Here, they will be accessible at your-domain.onrender.com/static/... or yourcustomdomain.com/static/...
 STATIC_URL = '/static/'
 
 # This production code might break development mode, so we check whether we're in DEBUG mode
@@ -155,9 +158,14 @@ if not DEBUG:
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'conexao_digital_api.User'
+
+
+AUTH_JWT_ACCESS_TOKEN_LIFETIME = timedelta(minutes=int(os.environ.get('AUTH_JWT_ACCESS_TOKEN_LIFETIME')) or 5)
+AUTH_JWT_REFRESH_TOKEN_LIFETIME = timedelta(days=int(os.environ.get('AUTH_JWT_REFRESH_TOKEN_LIFETIME')) or 1)
 
 AUTH_PASSWORD_RESET_URL = os.environ.get('AUTH_PASSWORD_RESET_URL') or "http://localhost:8000/auth/reset-password"
 AUTH_USER_SCHEMA = 'conexao_digital_api.schemas.UserSchema'
