@@ -1,0 +1,10 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+  <h2>Enviar Email</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" name="apply" class="button">Enviar</button>
+    <a href="{{ request.get_full_path }}" class="button">Cancelar</a>
+  </form>
+{% endblock %}

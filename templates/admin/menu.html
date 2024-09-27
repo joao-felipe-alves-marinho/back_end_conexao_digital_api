@@ -1,0 +1,15 @@
+{% extends 'admin/menu.html' %}
+{% block branding %}
+    <style>
+        .centered-link {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+    </style>
+    <div class="centered-link">
+        <a class="ui navbar-brand navbar-brand-margin" href="{% url 'admin:index' %}" style="margin: 8px;">Menu de
+            Adminstração</a>
+    </div>
+{% endblock %}
