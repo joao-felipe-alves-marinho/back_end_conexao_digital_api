@@ -9,32 +9,7 @@ services:
       - key: DEBUG
         value: "False"
       - key: SECRET_KEY
-        value: "django-secure-conexao-digital-5b($ne@ab)i9-l4lx4q$4f%y@p_k@vch9ruzc(q+nchlac-wlvw"
+        value: "django"
       - key: CORS_ALLOWED_ORIGINS
         value: http://localhost:5173,http://127.0.0.1:5173
-      - key: DB_URL
-        value: "postgresql://conexao_digital_db_user:2iYXSJHB2M6VszodlcR663Ndd9A6xyhF@dpg-cro6rbe8ii6s73f3l5tg-a.oregon-postgres.render.com/conexao_digital_db"
-      - key: LANGUAGE_CODE
-        value: "pt-br"
-      - key: TIME_ZONE
-        value: "America/Sao_Paulo"
-      - key: AUTH_PASSWORD_RESET_URL
-        value: "http://localhost:5173/reset-password"
-      - key: AUTH_JWT_ACCESS_TOKEN_LIFETIME
-        value: 1440
-      - key: AUTH_JWT_REFRESH_TOKEN_LIFETIME
-        value: 1
-      - key: EMAIL_BACKEND
-        value: "django.core.mail.backends.smtp.EmailBackend"
-      - key: EMAIL_HOST
-        value: "smtp.gmail.com"
-      - key: EMAIL_PORT
-        value: 587
-      - key: EMAIL_USE_TLS
-        value: "True"
-      - key: EMAIL_USE_SSL
-        value: "False"
-      - key: EMAIL_HOST_USER
-        value: "conexaodigital233@gmail.com"
-      - key: EMAIL_HOST_PASSWORD
-        value: "jbdq tska scxs laiz"
+      
