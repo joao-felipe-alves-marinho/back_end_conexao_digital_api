@@ -15,7 +15,7 @@ from dj_ninja_auth.jwt.controller import NinjaAuthJWTController
 
 from .models import User, Interesse, Habilidade, FormacaoAcademica, ExperienciaProfissional, Projeto
 from .schemas import (
-    UserSchema, UpdateUserSchema,
+    UserSchema, CreateUserSchema, UpdateUserSchema,
     HabilitadeSchema, CreateOrUpdateHabilidadeSchema,
     InteresseSchema, CreateOrUpdateInteresseSchema,
     FormacaoAcademicaSchema, CreateOrUpdateFormacaoAcademicaSchema,
@@ -30,7 +30,6 @@ api = NinjaExtraAPI(
     description='API para o projeto Conexao Digital',
     auth=[JWTAuth()],
 )
-
 
 api.register_controllers(NinjaAuthJWTController)
 
@@ -324,7 +323,6 @@ api.register_controllers(AdminUserModelController)
 
 @api_controller('/me', tags=['users'], permissions=[permissions.IsAuthenticated])
 class MeController(ControllerBase):
-
     @route.get('', response=UserSchema)
     def get_me(self, request):
         return request.user
@@ -476,7 +474,13 @@ class MeController(ControllerBase):
 api.register_controllers(MeController)
 
 
-@api.post("/send-email", tags=['admins'])
+@api.post('/me', tags=['users'], auth=None, response=UserSchema)
+def create_user(request, payload: CreateUserSchema):
+    user = User.objects.create_user(**payload.dict())
+    return user
+
+
+@api.post('/send-email', tags=['admins'])
 def send_emails_to_filtered_users(request, payload: EmailRequestSchema, filters: FilterEmailSchema = Query(...)):
     # Filter the users based on the filter schema
     users = User.objects.filter(filters.get_filter_expression(), is_superuser=False, is_staff=False)

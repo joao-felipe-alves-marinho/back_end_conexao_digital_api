@@ -86,6 +86,20 @@ class UserSchema(ModelSchema):
         )
 
 
+class CreateUserSchema(ModelSchema):
+    class Meta:
+        model = User
+        fields = (
+            'nome',
+            'password',
+            'email',
+            'idade',
+            'genero',
+            'telefone',
+            'deficiencia',
+        )
+
+
 class UpdateUserSchema(ModelSchema):
     class Meta:
         model = User
@@ -241,8 +255,10 @@ class FilterEmailSchema(FilterSchema):
     instituicao: Optional[str] = Field(None, q='formacoes_academicas__instituicao__icontains')
 
     # Filter for semestre above or below a given value
-    semestre_maior_que: Optional[int] = Field(None, q='formacoes_academicas__semestre__gte')  # Semestre greater than or equal
-    semestre_menow_que: Optional[int] = Field(None, q='formacoes_academicas__semestre__lte')  # Semestre less than or equal
+    semestre_maior_que: Optional[int] = Field(None,
+                                              q='formacoes_academicas__semestre__gte')  # Semestre greater than or equal
+    semestre_menow_que: Optional[int] = Field(None,
+                                              q='formacoes_academicas__semestre__lte')  # Semestre less than or equal
 
     # Filter by interests and skills (habilidades)
     interesses: Optional[List[str]] = Field(None, q='interesses__nome__in')
