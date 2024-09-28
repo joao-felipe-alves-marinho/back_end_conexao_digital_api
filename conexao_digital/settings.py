@@ -72,7 +72,7 @@ MIDDLEWARE = [
 ]
 
 # CORS setup
-CORS_ALLOWED_ORIGINS = [
+CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS') or [
     'http://localhost:5173',  # Allow your frontend to make requests to the backend
 ]
 
