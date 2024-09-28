@@ -474,7 +474,7 @@ class MeController(ControllerBase):
 api.register_controllers(MeController)
 
 
-@api.post('/me', tags=['users'], auth=None, response=UserSchema)
+@api.post('/create', tags=['auth'], auth=None, response=UserSchema)
 def create_user(request, payload: CreateUserSchema):
     user = User.objects.create_user(**payload.dict())
     return user
